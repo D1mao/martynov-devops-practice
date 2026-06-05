@@ -44,16 +44,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Prepare image name
+        run: |
+          OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_NAME=ghcr.io/${OWNER_LC}/foodtracker:latest" >> $GITHUB_ENV
+
       - name: Build image
         run: |
           docker build \
-          -t ghcr.io/${{ github.repository_owner }}/foodtracker:latest \
+          -t $IMAGE_NAME \
           .
 
       - name: Push image
         run: |
-          docker push \
-          ghcr.io/${{ github.repository_owner }}/foodtracker:latest
+          docker push $IMAGE_NAME
 
       - name: Telegram Success Notification
         if: success()
